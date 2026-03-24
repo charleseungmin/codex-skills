@@ -1,0 +1,4 @@
+interface:
+  display_name: "Image to Android UI"
+  short_description: "Turn UI images into Android XML or Compose code"
+  default_prompt: "Use $image-to-android-ui to implement this UI image as Android XML or Jetpack Compose."

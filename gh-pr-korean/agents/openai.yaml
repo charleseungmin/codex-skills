@@ -1,0 +1,4 @@
+interface:
+  display_name: "한글 PR 생성"
+  short_description: "한글 PR 본문과 차트를 작성하고 GitHub PR을 생성한다"
+  default_prompt: "$gh-pr-korean을 사용해 현재 브랜치를 push하고 필요하면 Mermaid 차트를 포함한 한글 PR을 생성해줘."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Exofit Components Dev"
+  short_description: "Build for the Exofit components library"
+  default_prompt: "Use $exofit-components-dev to implement changes that follow this repository's architecture and conventions."

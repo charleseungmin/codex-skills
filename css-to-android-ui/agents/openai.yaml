@@ -1,0 +1,4 @@
+interface:
+  display_name: "CSS to Android UI"
+  short_description: "Convert CSS-based UI into Android XML or Compose"
+  default_prompt: "Use $css-to-android-ui to convert this CSS-based component into Android XML or Jetpack Compose."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Flowchart Mermaid"
+  short_description: "Draw code flows as Mermaid flowcharts from Android code"
+  default_prompt: "Use $code-flowchart-mermaid to turn this Android fragment or logic flow into a Mermaid flowchart."

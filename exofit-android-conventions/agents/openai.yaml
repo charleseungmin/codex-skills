@@ -1,0 +1,4 @@
+interface:
+  display_name: "exoFit Android Conventions"
+  short_description: "Build Android changes in the exoFit repo style and structure"
+  default_prompt: "Use $exofit-android-conventions to implement this change in the exoFit project style."

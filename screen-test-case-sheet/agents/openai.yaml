@@ -1,0 +1,4 @@
+interface:
+  display_name: "Screen Test Case Sheet"
+  short_description: "Organize screen-based QA cases into a clear sheet format"
+  default_prompt: "Use $screen-test-case-sheet to organize test cases for these Android screens into a sheet with condition, input, and output."
