@@ -16,6 +16,7 @@
 | `gh-pr-korean` | 현재 브랜치를 푸시하고, 한글 제목과 본문을 포함한 GitHub Pull Request를 생성하거나 갱신합니다. |
 | `image-to-android-ui` | UI 이미지, 목업, 스크린샷을 Android View XML 또는 Jetpack Compose 코드로 재현합니다. |
 | `pdf` | 렌더링과 레이아웃을 고려해 PDF 파일을 읽고, 만들고, 검토합니다. |
+| `project-convention-adapter` | 현재 저장소의 기술 스택, 빌드 도구, 아키텍처, 코딩 컨벤션을 먼저 파악한 뒤 그 프로젝트 스타일에 맞춰 구현하도록 돕습니다. |
 | `screen-test-case-sheet` | 화면 단위로 QA 테스트 케이스를 스프레드시트 형태로 정리합니다. |
 | `screenshot` | 사용자가 명시적으로 요청한 경우 데스크톱 또는 시스템 스크린샷을 캡처합니다. |
 | `spreadsheet` | `.xlsx`, `.csv`, `.tsv` 같은 스프레드시트 파일을 생성, 수정, 분석, 포맷팅합니다. |
