@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Convention Adapter"
+  short_description: "Inspect repo stack and match local coding conventions"
+  default_prompt: "Use $project-convention-adapter to inspect this repository and implement changes in its existing style."
