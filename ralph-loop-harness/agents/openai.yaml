@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ralph Loop Harness"
+  short_description: "Run harness loops until target completion"
+  default_prompt: "Use $ralph-loop-harness to run the repository harness loop until the current target is complete."

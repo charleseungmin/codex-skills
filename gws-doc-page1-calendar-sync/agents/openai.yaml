@@ -1,0 +1,4 @@
+interface:
+  display_name: "GWS Docs Page1 Sync"
+  short_description: "Sync Docs page1 planner to Calendar and Tasks"
+  default_prompt: "Google Docs 1페이지의 오늘 일정/할 일을 gws로 동기화한다."

@@ -48,7 +48,10 @@ PR 템플릿 채우기, Draft 또는 Ready 판단, Mermaid 플로우차트 포�
 
 5. 인코딩이 깨지지 않도록 파일 기반으로 작성한다.
 - 한글이 들어가는 본문이나 JSON payload는 인라인 셸 인수로 직접 넘기지 않는다.
-- `scripts/write_utf8.py`로 `body.md` 또는 `payload.json`을 UTF-8로 저장한다.
+- Windows PowerShell에서 한글 here-string을 변수에 담아 파이프하거나 `ConvertTo-Json`에 넘기지 않는다. 콘솔 코드페이지 영향으로 한글이 `?`로 치환된 뒤 저장될 수 있다.
+- PR 제목/본문/payload는 Python이 UTF-8 파일을 직접 쓰도록 생성한다. PowerShell은 `gh api --input <payload.json>` 실행에만 사용한다.
+- Python 스크립트 안에 한글을 직접 넣어도 되지만, 콘솔/셸 경유가 의심되면 `\uXXXX` 유니코드 이스케이프 문자열로 제목과 본문을 만든다.
+- `scripts/write_utf8.py`는 이미 정상 Unicode 문자열이 stdin으로 들어온 경우에만 사용한다. PowerShell에서 한글이 `?`로 바뀐 뒤 전달되면 복구할 수 없다.
 - 저장 후에는 `Get-Content -Raw -Encoding UTF8 <file>`로 다시 읽어 한글이 정상인지 확인한다.
 - Windows 환경에서는 `gh pr create --body`보다 `--body-file` 또는 `gh api --input`을 우선한다.
 
@@ -73,48 +76,86 @@ PR 템플릿 채우기, Draft 또는 Ready 판단, Mermaid 플로우차트 포�
 - 이 스킬이 만드는 Markdown과 JSON 파일은 모두 UTF-8이어야 한다.
 - CP949 또는 EUC-KR을 전제로 처리하지 않는다.
 - 한글 본문은 `--body` 인라인 옵션보다 파일 기반 옵션을 우선한다.
+- Windows PowerShell에서 `$body = @' ... 한글 ... '@`, `$payload = @{ title = "한글" }`, `ConvertTo-Json` 조합을 사용하지 않는다. 이 조합은 환경에 따라 GitHub에 `??`가 그대로 저장될 수 있다.
+- `Get-Content` 결과를 JSON payload의 `body` 값으로 바로 넣지 않는다. PowerShell 객체 메타데이터가 함께 직렬화될 수 있다. 파일 본문은 Python `Path(...).read_text(encoding="utf-8")`로 읽는다.
 - 인코딩이 의심되면 파일을 다시 UTF-8로 저장하고 재확인한 뒤에만 PR 생성 또는 갱신을 진행한다.
-- 제목이 콘솔에서 깨져 보여도 PR 생성 직후 `gh pr view --json title,url`로 실제 저장값을 확인한다.
+- 제목이 콘솔에서 깨져 보여도 PR 생성 직후 `gh pr view --json title,url`로 실제 저장값을 확인한다. 실제 GitHub 값이 깨졌으면 즉시 PATCH로 고치지 말고, payload 생성 방식을 Python UTF-8/유니코드 이스케이프 방식으로 수정한 뒤 한 번만 다시 호출한다.
 
 ## Command Pattern
 
-### 본문 파일 저장
+### 본문 및 새 PR payload 저장
 
 ```powershell
-$body = @'
-## Summary
-- 요약
+@'
+import json
+from pathlib import Path
 
-## Changes
-- 변경 사항
-'@
-$body | python C:\Users\lenovo\.codex\skills\gh-pr-korean\scripts\write_utf8.py body.md
-Get-Content -Raw -Encoding UTF8 .\body.md
-```
-
-### 새 PR payload 저장
-
-```powershell
-$payload = @{
-  title = "한글 PR 제목"
-  head = $branch
-  base = $base
-  body = Get-Content -Raw -Encoding UTF8 .\body.md
-  draft = $true
-} | ConvertTo-Json -Depth 5
-$payload | python C:\Users\lenovo\.codex\skills\gh-pr-korean\scripts\write_utf8.py payload.json
+body = "\n".join([
+    "## Summary",
+    "- PR 요약",
+    "",
+    "## Changes",
+    "- 변경 사항",
+    "",
+    "## How to test",
+    "- 컴파일/테스트 미실행",
+])
+payload = {
+    "title": "Fix: 한글 PR 제목",
+    "head": "branch-name",
+    "base": "main",
+    "body": body,
+    "draft": True,
+}
+Path("payload.json").write_text(
+    json.dumps(payload, ensure_ascii=False),
+    encoding="utf-8",
+)
+'@ | python -
 gh api repos/$owner/$repo/pulls --method POST --input payload.json
 ```
 
 ### 기존 PR 갱신
 
 ```powershell
-$payload = @{
-  title = "수정된 한글 PR 제목"
-  body = Get-Content -Raw -Encoding UTF8 .\body.md
-} | ConvertTo-Json -Depth 5
-$payload | python C:\Users\lenovo\.codex\skills\gh-pr-korean\scripts\write_utf8.py payload.json
+@'
+import json
+from pathlib import Path
+
+payload = {
+    "title": "Fix: 수정된 한글 PR 제목",
+    "body": Path("body.md").read_text(encoding="utf-8"),
+}
+Path("payload.json").write_text(
+    json.dumps(payload, ensure_ascii=False),
+    encoding="utf-8",
+)
+'@ | python -
 gh api repos/$owner/$repo/pulls/$number --method PATCH --input payload.json
+```
+
+### PowerShell 인코딩이 의심될 때
+
+```powershell
+@'
+import json
+from pathlib import Path
+
+title = "Fix: \ud55c\uae00 PR \uc81c\ubaa9"
+body = "## Summary\n- \ud55c\uae00 \ubcf8\ubb38"
+payload = {
+    "title": title,
+    "head": "branch-name",
+    "base": "main",
+    "body": body,
+    "draft": True,
+}
+Path("payload.json").write_text(
+    json.dumps(payload, ensure_ascii=False),
+    encoding="utf-8",
+)
+'@ | python -
+gh api repos/$owner/$repo/pulls --method POST --input payload.json
 ```
 
 ## Notes

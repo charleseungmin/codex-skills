@@ -1,0 +1,4 @@
+interface:
+  display_name: "Android Clean Architecture"
+  short_description: "Write Android code with clean architecture"
+  default_prompt: "Use $android-clean-architecture to implement an Android feature with clear data, domain, and presentation boundaries."
